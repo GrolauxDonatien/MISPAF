@@ -1,0 +1,60 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mon site !</title>
+    <link rel="stylesheet" type="text/css" href="resources/style.css">
+</head>
+
+<body class="nologin">
+    <div class="topbar">
+        <img src="resources/logo.png">
+        <a href="index.html" class="logolink">Mon site !</a>
+        <span class="menu">
+            <a class="noauthrequired" href="#login" id="loginBtn">S'authentifier</a>
+            <a class="noauthrequired" href="#register" id="registerBtn">S'inscrire</a>
+            <a class="authrequired" href="#" id="logoutBtn">Se déconnecter</a>
+        </span>
+    </div>
+    <div class="main">
+        <div class="menu">
+            <ul>
+                <li><a href="#home">Accueil</a></li>
+                <li class="authrequired"><a href="#profile">Changer le mdp</a></li>
+                <li class="authrequired"><a href="#listUsers">Liste des utilisateurs</a></li>
+                <li class="authrequired"><a href="#upload">Envoyer un fichier</a></li>
+            </ul>
+        </div>
+        <div class="pages">
+            
+        </div>
+    </div>
+    <div class="footer">
+        <div>&#x24B8; 2022 Donatien Grolaux </div>
+    </div>
+    <script src="resources/mispaf.js"></script>
+    <script>
+        class HTTPError extends Error {
+            constructor(message, status) {
+                super(message || "Internal Server Error");
+                this.status = status || 500;
+            }
+        }
+        // Leave this script at the bottom of this page
+        mispaf.setMenu(document.querySelector('.topbar .menu'));
+        mispaf.setMenu(document.querySelector('.main .menu'));
+        mispaf.ajax({
+            url: "views/list",
+            type: 'POST',
+            success(scripts) {
+                for (let i = 0; i < scripts.length; i++) {
+                    let script = document.createElement("SCRIPT");
+                    script.setAttribute("src", "views/" + scripts[i]);
+                    document.body.appendChild(script);
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
