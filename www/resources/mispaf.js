@@ -1,7 +1,7 @@
 /******************************************************
 * MInimalist Single Page Application Framework
 *
-* Copyright 2019 Donatien Grolaux
+* Copyright 2022 Donatien Grolaux
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
 * and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -269,6 +269,11 @@ const mispaf = (function () {
             throw new Error("Invalid first parameter, not a FORM element");
         }
         // cherche le message d'erreur qui suit le champ de ce nom
+        const namefields = form.querySelectorAll('[name="' + name + '"]');
+        if (namefields.length==0) {
+            throw new Error("Missing element with name: "+name);
+        }
+        const namefield = namefields[namefields.length - 1];
         let error = form.querySelector('[name="' + name + '"] + .error');
         if (msg != null) {
             // est-il présent ?
@@ -276,8 +281,6 @@ const mispaf = (function () {
                 error = document.createElement("div"); // <div class="error">
                 error.setAttribute("class", "error");
                 // trouver le dernier champ du formulaire possédant ce nom
-                const namefields = form.querySelectorAll('[name="' + name + '"]');
-                const namefield = namefields[namefields.length - 1];
                 namefield.parentNode.insertBefore(error, namefield.nextSibling);
                 namefield.parentNode.classList.remove("hasError");
                 namefield.parentNode.classList.add("hasError");
