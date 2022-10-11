@@ -37,7 +37,7 @@ mispaf.addPage({
     },
     async 'click:[data-id="ok"]'() {
         try {
-            await lib.api('auth/login', this.form);
+            await mispaf.api('auth/login', this.form);
             mispaf.page('home');
         } catch (e) {
             mispaf.page('error',e.message);
@@ -164,7 +164,7 @@ The API of ```mispaf``` is composed of several parts:
 	- ```mispaf.reset(form)```: clears the form by resetting all interactive elements.
 	- ```mispaf.validateNotEmpty(form,fields,msg)```: validates that the fields of ```form``` whose name are in the ```fields``` array are not empty. When this is not the case, the error message ```msg``` is inserted after the field. Returns ```true``` is all fields are not empty, otherwise ```false```.
 	- ```mispaf.setFieldError(form,name,msg)```: inserts the error message ```msg``` in the page after the field with ```name``` in ```form```. If ```msg``` is null, then it removes the error message.
-	- ```clearErrors(form)```: removes all error messages in ```form```.
+	- ```mispaf.clearErrors(form)```: removes all error messages in ```form```.
 
 - HTML utility functions:
 	- ```mispaf.escape(string)```: replaces special HTML characters in String to their HTML entities equivalent, ensuring the string can be inserted into source HTML and still be displayed as intended.
