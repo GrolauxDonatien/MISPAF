@@ -172,7 +172,7 @@ The API of ```mispaf``` is composed of several parts:
 	- ```mispaf.parentElement(element,selector)```: returns the closest ancestor element of ```element``` that corresponds to the CSS ```selector```.
 
 - Ajax calls:
-	- ```mispaf.ajax({url,type,data,success,error,mimeType)```: emits an Ajax call. ```url``` is the endpoint, ```type``` is the HTTP method type (GET by default), ```data``` is the payload, ```success``` and ```error``` are callbacks in case of a succesful response (HTTP status 200) or not, and ```mimeType``` can be used to enforce a specific mime type for the payload. The payload can either be an object, or a form DOM element. In the later case, ```<input type="file">``` are supported (by using a base64 encoding).
+	- ```mispaf.ajax({url,type,data,success,error,mimeType})```: emits an Ajax call. ```url``` is the endpoint, ```type``` is the HTTP method type (GET by default), ```data``` is the payload, ```success``` and ```error``` are callbacks in case of a succesful response (HTTP status 200) or not, and ```mimeType``` can be used to enforce a specific mime type for the payload. The payload can either be an object, or a form DOM element. In the later case, ```<input type="file">``` are supported (by using a base64 encoding).
 	- ```mispaf.api(url,data)```: emits an Ajax call, and returns a promise. ```url``` is the endpoint, the HTTP method is always set to POST, and ```data``` is the payload. The payload can either be an object, or a form DOM element. In the later case, ```<input type="file">``` are supported (by using a base64 encoding).
 
 - Navigation between the pages of the application:
