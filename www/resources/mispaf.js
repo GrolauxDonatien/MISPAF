@@ -167,10 +167,53 @@ const mispaf = (function () {
         return element instanceof Element || element instanceof HTMLDocument;
     }
 
-    function ajax({ url, type, data, success, error, mimeType }) {
+    function ajax({ url, type, data, success, error, mimeType, pending }) {
+        if (url === undefined && ("url" in mispaf.ajaxDefault)) url = mispaf.ajaxDefault.url;
+        if (type === undefined && ("type" in mispaf.ajaxDefault)) type = mispaf.ajaxDefault.type;
+        if (success === undefined && ("success" in mispaf.ajaxDefault)) success = mispaf.ajaxDefault.success;
+        if (error === undefined && ("error" in mispaf.ajaxDefault)) error = mispaf.ajaxDefault.error;
+        if (mimeType === undefined && ("mimeType" in mispaf.ajaxDefault)) mimeType = mispaf.ajaxDefault.mimeType;
+        if (pending === undefined && ("pending" in mispaf.ajaxDefault)) pending = mispaf.ajaxDefault.pending;
+
         if (type === undefined) type = "GET";
         if (url === undefined) url = ".";
         const xmlhttp = new XMLHttpRequest();
+
+        function getPending() {
+            if (pending) {
+                let v=parseInt(pending.getAttribute("data-count"));
+                if (!isNaN(v)) return v;
+            }
+            return 0;
+        }
+
+        function setPending(v) {
+            if (pending) {
+                pending.setAttribute("data-count",v);
+            }
+        }
+
+        function decPending() {
+            if (pending) {
+                let c=getPending()-1;
+                if (c<=0) {
+                    pending.style.display="none";
+                    setPending(0);
+                } else {
+                    setPending(c);
+                }
+            }
+        }
+
+        function incPending() {
+            if (pending) {
+                let c=getPending()+1;
+                setTimeout(()=>{
+                    if (getPending()>0) pending.style.display="block";
+                },100); // avoid flashing the pending icon
+                setPending(c);
+            }
+        }
 
         function getResponse() {
             if (xmlhttp.getResponseHeader('content-type') && xmlhttp.getResponseHeader('content-type').startsWith("application/json")) {
@@ -191,6 +234,7 @@ const mispaf = (function () {
 
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                decPending();
                 if (xmlhttp.status == 200) {
                     if (success !== undefined) {
                         success(getResponse());
@@ -206,12 +250,14 @@ const mispaf = (function () {
             }
         };
         xmlhttp.onabort = function () {
+            decPending();
             if (error !== undefined) {
                 error(null, "abort", xmlhttp);
                 success = undefined; error = undefined;
             }
         }
         xmlhttp.onerror = function () {
+            decPending();
             if (error !== undefined) {
                 error(null, "error", xmlhttp);
                 success = undefined; error = undefined;
@@ -220,28 +266,32 @@ const mispaf = (function () {
 
         let toSend = undefined;
         xmlhttp.open(type, url, true);
-        if (mimeType != undefined) {
-            xmlhttp.setRequestHeader('Content-Type', mimeType);
-        }
         (async () => {
             if (data !== undefined) {
-                if (typeof data === "string" || data instanceof String || typeof data === "number" || data instanceof Number) {
-                    if (mimeType === undefined) xmlhttp.setRequestHeader('Content-Type', 'text/plain');
-                    toSend = "" + data;
-                } else if (isElement(data)) {
+                if (isElement(data)) { // force mimeType for forms
                     if (data.nodeName == "FORM") {
-                        if (mimeType === undefined) xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                        mimeType = 'application/x-www-form-urlencoded';
                         toSend = await serializeArray(data);
-                    } else throw "Cannot make ajax call with this data";
-                } else if (data.constructor === {}.constructor || data.constructor === [].constructor) {
-                    if (mimeType === "application/json") {
-                        toSend = JSON.stringify(data);
+                    } else throw new Error("Cannot make ajax call with this data");
+                } else if (mimeType === undefined) { // guess a mimeType depending on data
+                    if (typeof data === "string" || data instanceof String || typeof data === "number" || data instanceof Number) {
+                        mimeType = 'text/plain';
+                        toSend = "" + data;
                     } else {
-                        if (mimeType === undefined) xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                        mimeType = 'application/x-www-form-urlencoded';
                         toSend = await serializeArray(data);
                     }
-                } else throw "Cannot make ajax call with this data";
+                } else if (mimeType === 'application/json') {
+                    toSend = JSON.stringify(data);
+                } else if (mimeType === 'application/x-www-form-urlencoded') {
+                    toSend = await serializeArray(data);
+                }
+                if (mimeType === undefined) {
+                    throw new Error("Cannot make ajax call with this data");
+                }
             }
+            if (mimeType !== "undefined") xmlhttp.setRequestHeader('Content-Type', mimeType);
+            incPending();
             xmlhttp.send(toSend);
         })();
     }
@@ -254,7 +304,7 @@ const mispaf = (function () {
         let withError = false;
         for (let i = 0; i < fields.length; i++) {
             const name = fields[i];
-            if (data[name] !== undefined && data[name].length===0) { // ce champ est vide
+            if (data[name] !== undefined && data[name].length === 0) { // ce champ est vide
                 setFieldError(form, name, msg);
                 withError = true;
             } else {
@@ -270,8 +320,8 @@ const mispaf = (function () {
         }
         // cherche le message d'erreur qui suit le champ de ce nom
         const namefields = form.querySelectorAll('[name="' + name + '"]');
-        if (namefields.length==0) {
-            throw new Error("Missing element with name: "+name);
+        if (namefields.length == 0) {
+            throw new Error("Missing element with name: " + name);
         }
         const namefield = namefields[namefields.length - 1];
         let error = form.querySelector('[name="' + name + '"] + .error');
@@ -432,6 +482,10 @@ const mispaf = (function () {
             // update menu : set new tag
             elems = document.querySelectorAll('a[href="#' + target + '"]');
             for (let i = 0; i < elems.length; i++) elems[i].classList.add("menuSelected");
+            // manage history ?
+            if (mispaf.enableHistory===true) {
+                history.pushState({},"","#"+target);
+            }
         }
     }
 
@@ -526,7 +580,7 @@ const mispaf = (function () {
             return ts.startsWith("=>");
         }
 
-        function wrap(obj, prop, preventDefault=false) {
+        function wrap(obj, prop, preventDefault = false) {
             if (isArrowFn(obj[prop])) {
                 throw new Error("A proper function is required, but an arrow function (=>) was provided for " + prop + " for the page " + obj.id);
             }
@@ -612,6 +666,7 @@ const mispaf = (function () {
         clearErrors,
         ajax,
         ajaxError,
+        ajaxDefault: {},
         formatError,
         parentElement,
         page,
