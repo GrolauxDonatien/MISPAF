@@ -167,13 +167,14 @@ const mispaf = (function () {
         return element instanceof Element || element instanceof HTMLDocument;
     }
 
-    function ajax({ url, type, data, success, error, mimeType, pending }) {
+    function ajax({ url, type, data, success, error, mimeType, pending, progress }) {
         if (url === undefined && ("url" in mispaf.ajaxDefault)) url = mispaf.ajaxDefault.url;
         if (type === undefined && ("type" in mispaf.ajaxDefault)) type = mispaf.ajaxDefault.type;
         if (success === undefined && ("success" in mispaf.ajaxDefault)) success = mispaf.ajaxDefault.success;
         if (error === undefined && ("error" in mispaf.ajaxDefault)) error = mispaf.ajaxDefault.error;
         if (mimeType === undefined && ("mimeType" in mispaf.ajaxDefault)) mimeType = mispaf.ajaxDefault.mimeType;
         if (pending === undefined && ("pending" in mispaf.ajaxDefault)) pending = mispaf.ajaxDefault.pending;
+        if (progress === undefined && ("progress" in mispaf.ajaxDefault)) progress = mispaf.ajaxDefault.progress;
 
         if (type === undefined) type = "GET";
         if (url === undefined) url = ".";
@@ -181,7 +182,7 @@ const mispaf = (function () {
 
         function getPending() {
             if (pending) {
-                let v=parseInt(pending.getAttribute("data-count"));
+                let v = parseInt(pending.getAttribute("data-count"));
                 if (!isNaN(v)) return v;
             }
             return 0;
@@ -189,15 +190,15 @@ const mispaf = (function () {
 
         function setPending(v) {
             if (pending) {
-                pending.setAttribute("data-count",v);
+                pending.setAttribute("data-count", v);
             }
         }
 
         function decPending() {
             if (pending) {
-                let c=getPending()-1;
-                if (c<=0) {
-                    pending.style.display="none";
+                let c = getPending() - 1;
+                if (c <= 0) {
+                    pending.style.display = "none";
                     setPending(0);
                 } else {
                     setPending(c);
@@ -207,10 +208,10 @@ const mispaf = (function () {
 
         function incPending() {
             if (pending) {
-                let c=getPending()+1;
-                setTimeout(()=>{
-                    if (getPending()>0) pending.style.display="block";
-                },100); // avoid flashing the pending icon
+                let c = getPending() + 1;
+                setTimeout(() => {
+                    if (getPending() > 0) pending.style.display = "block";
+                }, 100); // avoid flashing the pending icon
                 setPending(c);
             }
         }
@@ -261,6 +262,12 @@ const mispaf = (function () {
             if (error !== undefined) {
                 error(null, "error", xmlhttp);
                 success = undefined; error = undefined;
+            }
+        }
+
+        if (progress) {
+            xmlhttp.onprogress = function (event) {
+                progress(event.loaded, event.total, event);
             }
         }
 
@@ -483,8 +490,8 @@ const mispaf = (function () {
             elems = document.querySelectorAll('a[href="#' + target + '"]');
             for (let i = 0; i < elems.length; i++) elems[i].classList.add("menuSelected");
             // manage history ?
-            if (mispaf.enableHistory===true) {
-                history.pushState({},"","#"+target);
+            if (mispaf.enableHistory === true) {
+                history.pushState({}, "", "#" + target);
             }
         }
     }
