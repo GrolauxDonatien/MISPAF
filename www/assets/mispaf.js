@@ -363,12 +363,12 @@ const mispaf = (function () {
         for (let i = 0; i < els.length; i++) {
             els[i].parentElement.removeChild(els[i]);
         }
-        els = form.querySelectorAll("has-error");
+        els = form.querySelectorAll(".has-error");
         for (let i = 0; i < els.length; i++) {
             els[i].classList.remove("has-error");
         }
         form.classList.remove("has-error");
-        els = form.querySelectorAll("is-invalid");
+        els = form.querySelectorAll(".is-invalid");
         for (let i = 0; i < els.length; i++) {
             els[i].classList.remove("is-invalid");
         }
