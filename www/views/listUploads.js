@@ -1,5 +1,5 @@
 mispaf.addPage({
-    id: "listUsers",
+    id: 'listUploads',
     class: "card",
     html: `
     <div class="card-body p-0">
@@ -15,20 +15,20 @@ mispaf.addPage({
             </tbody>
         </table>
     </div>
-</div>`, async enter() {
-        this.tbody.innerHTML = '';
-        let response;
+</div>
+    `,
+    async enter(event) {
+        let files;
         try {
-            response = await mispaf.api('/users/listUsers');
+            files = await mispaf.api('file/listUploads');
         } catch (e) {
             mispaf.page('error', e.message);
         }
         let rows = [];
-        for (let i = 0; i < response.length; i++) {
+        for (let i = 0; i < files.files.length; i++) {
             rows.push(`
 <tr>
-    <td>${mispaf.escape(response[i].login)}</td>
-    <td><button onclick="deleteUser(${response[i].id})" class="btn btn-secondary">Effacer...</button></td>
+    <td><a href="${mispaf.escape(files.root)}/${mispaf.escape(files.files[i])}" target="_blank">${mispaf.escape(files.files[i])}</a></td>
 </tr>
 `);
         }
@@ -36,11 +36,3 @@ mispaf.addPage({
     }
 });
 
-async function deleteUser(id) {
-    try {
-        await mispaf.api('/users/delete', { id });
-        mispaf.page(mispaf.page()); // refresh page
-    } catch (e) {
-        mispaf.page('error', e.message);
-    }
-}

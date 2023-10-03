@@ -1,7 +1,8 @@
 module.exports={
     dbfile:"app.db",
     secret:"mqldsjkf mqlsdkfj mlqsdf kqmslfj",
-    port:8080,
+    port:8081,
     maxupload:"200mb",
-    uploadDirectory:"uploads"
+    uploadDirectory:"www/uploads",
+    uploadPrefix:"uploads"
 }

@@ -1,22 +1,29 @@
 mispaf.addPage({
     id: 'upload',
-    class:"center",
+    class:"card",
     html: `
-    <h4>Formulaire d'upload</h4>
-    <div>
-        <div class="box">
-            <form data-id="form">
-                <div class="boxtop">
-                    <div>
-                        <label for="ufile">Fichier</label> : <input type="file" id="ufile" name="upload">
-                    </div>
-                </div>
-                <hr>
-                <input type="submit" value="Annuler" class="roundedButton">
-                <input type="submit" value="Ok" class="roundedButton">
-            </form>
+<div class="card-header p-4 border-bottom border-300 bg-soft">
+    <div class="row g-3 justify-content-between align-items-center">
+        <div class="col-12 col-md">
+            <h4 class="text-900 mb-0" data-anchor="data-anchor">Formulaire d'upload</h4>
         </div>
     </div>
+</div>
+<div class="card-body p-0">
+    <div class="p-4">
+        <form data-id="form">
+            <div class="mb-3">
+                <div>
+                    <label class="form-label" for="ufile">Fichier</label> : <input
+                        type="file" id="ufile" class="form-control" name="upload">
+                </div>
+            </div>
+            <hr>
+            <input type="submit" value="Annuler" class="btn btn-sm btn-secondary">
+            <input type="submit" value="Ok" class="btn btn-sm btn-primary">
+        </form>
+    </div>
+</div>
     `,
     enter(event) {
         if ("leavePage" in event) this.old=event.leavePage;

@@ -37,6 +37,7 @@ if (config.uploadDirectory) {
 if (!config.virtualPath || config.virtualPath.length == 0) config.virtualPath = "/";
 
 server.use(config.virtualPath, express.static(config.www || "./www"));
+server.use(path.join(config.virtualPath,"assets","bootstrap").replace(/\\/g,"/"), express.static(path.join(__dirname,'..','node_modules','bootstrap','dist')));
 
 class HTTPError extends Error {
     constructor(message, status) {

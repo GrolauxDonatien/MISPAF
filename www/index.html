@@ -3,43 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <title>Mon site !</title>
-    <link rel="stylesheet" type="text/css" href="resources/style.css">
+    <link rel="stylesheet" type="text/css" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/theme.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/style.css">
 </head>
+<!-- design based on this theme: https://prium.github.io/phoenix/v1.13.0/index.html -->
 
 <body class="nologin">
-    <div class="topbar">
-        <img src="resources/logo.png">
-        <a href="index.html" class="logolink">Mon site !</a>
-        <span class="menu">
-            <a class="noauthrequired" href="#login" id="loginBtn">S'authentifier</a>
-            <a class="noauthrequired" href="#register" id="registerBtn">S'inscrire</a>
-            <a class="authrequired" href="#" id="logoutBtn">Se déconnecter</a>
-        </span>
-    </div>
-    <div class="main">
-        <div class="menu">
-            <ul>
-                <li><a href="#home">Accueil</a></li>
-                <li class="authrequired"><a href="#profile">Changer le mdp</a></li>
-                <li class="authrequired"><a href="#listUsers">Liste des utilisateurs</a></li>
-                <li class="authrequired"><a href="#upload">Envoyer un fichier</a></li>
-            </ul>
+    <main class="main" id="top">
+        <nav class="navbar navbar-vertical navbar-expand-lg">
+            <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
+                <div class="navbar-vertical-content menu">
+                    <ul class="navbar-nav flex-column" id="navbarVerticalNav">
+                        <li class="nav_item nologin"><a class="nav-link" href="#home">Accueil</a></li>
+                        <li class="nav_item login"><a class="nav-link" href="#listUsers">Liste des
+                                utilisateurs</a></li>
+                        <li class="nav_item login"><a class="nav-link" href="#upload">Envoi d'un
+                                fichier</a>
+                        </li>
+                        <li class="nav_item login"><a class="nav-link" href="#listUploads">Liste des
+                                fichiers</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <nav class="navbar navbar-top fixed-top navbar-expand topbar" id="navbarDefault">
+            <div class="collapse navbar-collapse justify-content-between">
+                <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
+                    aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation"><span
+                        class="navbar-toggle-icon"><span class="toggle-line"></span></span></button>
+                <img src="assets/logo.png">
+                <a class="navbar-brand me-1 me-sm-3" href="index.html">
+                    <div class="d-flex align-items-center">
+                        <p class="logo-text ms-2 d-none d-sm-block">Mon site !</p>
+                    </div>
+                </a>
+
+                <ul class="navbar-nav navbar-nav-icons flex-row menu nomenumark">
+                    <li class="nav-item dropdown login"><a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#"
+                            role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
+                            aria-expanded="false">
+                            <div class="avatar avatar-l ">
+                                <img class="rounded-circle " src="assets/user.webp" alt="">
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border border-300"
+                            aria-labelledby="navbarDropdownUser">
+                            <div class="card position-relative border-0">
+                                <div class="card-body p-0">
+                                    <div class="text-center pt-4 pb-3">
+                                        <div class="avatar avatar-xl ">
+                                            <img class="rounded-circle " src="assets/user.webp" alt="">
+                                        </div>
+                                        <h6 class="mt-2 text-black" id="username"></h6>
+                                    </div>
+                                </div>
+                                <div class="overflow-auto scrollbar" style="height: 5rem;">
+                                    <ul class="nav d-flex flex-column mb-2 pb-1">
+                                        <li class="nav-item"><a class="nav-link px-3" href="#profile"> <svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16px" height="16px"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-user me-2 text-900">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="12" cy="7" r="4"></circle>
+                                                </svg><span>Profil</span></a></li>
+                                        <li class="nav-item"><a class="nav-link px-3" href="#help"> <svg
+                                                    xmlns="http://www.w3.org/2000/svg" width="16px" height="16px"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-help-circle me-2 text-900">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                                </svg>Aide</a></li>
+                                    </ul>
+                                </div>
+                                <div class="card-footer p-0 border-top">
+                                    <div class="px-3"> <a class="btn btn-phoenix-secondary d-flex flex-center w-100"
+                                            href="#" id="logoutBtn"> <svg xmlns="http://www.w3.org/2000/svg"
+                                                width="16px" height="16px" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="feather feather-log-out me-2">
+                                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                                <polyline points="16 17 21 12 16 7"></polyline>
+                                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                                            </svg>Déconnecter</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item nologin">
+                        <a class="btn btn-phoenix-secondary d-flex flex-center w-100" href="#login" id="loginBtn"> <svg
+                                xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="feather feather-log-out me-2">
+                                <path transform="rotate(179.89 19.0601 11.9259)" stroke="null" id="svg_1"
+                                    d="m22.07864,20.9259l-4.0247,0a2.01235,2 0 0 1 -2.01235,-2l0,-14a2.01235,2 0 0 1 2.01235,-2l4.0247,0" />
+                                <polyline id="svg_2"
+                                    points="13.443552613258362,16.999999426305294 18.443552613258362,12.00000037997961 13.443552613258362,6.999999903142452 " />
+                                <line stroke="null" id="svg_3" y2="12" x2="1.84936" y1="12" x1="18.44355" />
+                                <path transform="rotate(89.9087 15.4277 5.04936)" stroke="null" id="svg_6"
+                                    d="m17.50145,11.67817l-2.765,0a1.3825,1.47307 0 0 1 -1.3825,-1.47307l0,-10.31147a1.3825,1.47307 0 0 1 1.3825,-1.47307l2.765,0" />
+                                <path transform="rotate(-89.8616 15.2968 19.0687)" stroke="null" id="svg_7"
+                                    d="m17.16677,25.86422l-2.49331,0a1.24665,1.51012 0 0 1 -1.24665,-1.51012l0,-10.57077a1.24665,1.51012 0 0 1 1.24665,-1.51012l2.49331,0" />
+                            </svg>S'authentifier</a>
+                    </li>
+                    <li class="nav-item nologin">
+                        <a class="btn btn-phoenix-secondary d-flex flex-center w-100" href="#register"
+                            style="margin-left:10px" id="registerBtn"><svg xmlns="http://www.w3.org/2000/svg"
+                                width="16px" height="16px" viewBox="0 0 360 360" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="feather feather-log-out me-2">
+                                <g transform="translate(0.000000,360.000000) scale(0.100000,-0.100000)" fill="#000000"
+                                    stroke="none">
+                                    <path d="M480 3213 c-197 -34 -376 -188 -452 -389 l-23 -59 -3 -926 c-3 -1022
+            -4 -1010 59 -1137 61 -125 201 -247 337 -294 l67 -23 955 0 c875 0 960 1 1010
+            17 135 42 278 162 344 288 56 106 66 170 66 441 0 254 -2 262 -53 275 -26 6
+            -37 -2 -118 -83 l-89 -89 0 -167 c0 -144 -3 -174 -21 -222 -28 -76 -108 -156
+            -184 -184 -55 -21 -66 -21 -955 -21 -886 0 -900 0 -955 21 -68 25 -147 99
+            -178 166 l-22 48 0 925 0 925 25 50 c34 70 108 139 176 165 57 21 62 21 997
+            20 l940 -2 63 63 c52 51 64 69 64 95 0 38 -7 44 -85 75 l-60 24 -940 1 c-517
+            1 -951 0 -965 -3z" />
+                                    <path d="M3015 3185 c-17 -9 -78 -63 -135 -120 l-105 -105 290 -290 290 -290
+            103 103 c57 56 113 120 123 142 24 51 24 109 0 160 -23 48 -363 389 -404 404
+            -41 16 -127 13 -162 -4z" />
+                                    <path d="M1967 2152 l-677 -677 0 -288 0 -287 293 0 292 0 678 678 677 677
+            -288 288 c-158 158 -289 287 -292 287 -3 0 -310 -305 -683 -678z m704 398 c11
+            -7 19 -21 19 -38 0 -21 -64 -90 -347 -375 -192 -192 -361 -358 -376 -369 -26
+            -19 -29 -19 -52 -4 -14 9 -25 24 -25 34 0 17 737 762 753 762 5 0 17 -5 28
+            -10z m-796 -1077 l149 -153 -114 -115 -115 -115 -57 0 -58 0 0 95 0 94 -97 3
+            -98 3 3 60 2 60 113 113 c61 61 114 111 117 111 3 -1 72 -71 155 -156z" />
+                                </g>
+                            </svg>
+                            S'inscrire</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="content">
+            <div class="pb-5">
+                <div class="row g-4">
+                    <div class="col-12 col-xxl-6 pages">
+                        <div class="page" id="help">
+                            <h2>Page d'aide</h2>
+                            <hr>
+                            Rien pour le moment
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="pages">
-            
-        </div>
-    </div>
-    <div class="footer">
-        <div>&#x24B8; 2022 Donatien Grolaux </div>
-    </div>
-    <script src="resources/mispaf.js"></script>
+    </main>
+    <script src="assets/popper.min.js"></script>
+    <script src="assets/mispaf.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script>
-        class HTTPError extends Error {
-            constructor(message, status) {
-                super(message || "Internal Server Error");
-                this.status = status || 500;
-            }
-        }
+        HTTPError = mispaf.HTTPError;
         // Leave this script at the bottom of this page
         mispaf.setMenu(document.querySelector('.topbar .menu'));
         mispaf.setMenu(document.querySelector('.main .menu'));

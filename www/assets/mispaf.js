@@ -331,24 +331,27 @@ const mispaf = (function () {
             throw new Error("Missing element with name: " + name);
         }
         const namefield = namefields[namefields.length - 1];
-        let error = form.querySelector('[name="' + name + '"] + .error');
+        let error = form.querySelector('[name="' + name + '"] ~ .invalid-feedback');
         if (msg != null) {
             // est-il présent ?
             if (error === null) { // non : le créer
                 error = document.createElement("div"); // <div class="error">
-                error.setAttribute("class", "error");
+                error.setAttribute("class", "invalid-feedback");
                 // trouver le dernier champ du formulaire possédant ce nom
-                namefield.parentNode.insertBefore(error, namefield.nextSibling);
-                namefield.parentNode.classList.remove("hasError");
-                namefield.parentNode.classList.add("hasError");
+                let current = namefield;
+                while (current.nextElementSibling != null && current.nextElementSibling.tagName == "LABEL") current = current.nextElementSibling;
+                namefield.parentNode.insertBefore(error, current.nextSibling);
+                for (let i = 0; i < namefields.length; i++) namefields[i].classList.add("is-invalid");
+                namefield.parentNode.classList.add("has-error");
             } else { // oui : le vider
                 error.innerHTML = "";
             }
             const text = document.createTextNode(msg);
             error.appendChild(text);
         } else if (error !== null) { // ce message d'erreur doit disparaître
-            namefield.parentNode.classList.remove("hasError");
+            for (let i = 0; i < namefields.length; i++) namefields[i].classList.remove("is-invalid");
             error.parentNode.removeChild(error);
+            namefield.parentNode.classList.remove("has-error");
         }
     }
 
@@ -356,13 +359,18 @@ const mispaf = (function () {
         if (!form || form.tagName != "FORM") {
             throw new Error("Invalid first parameter, not a FORM DOM element");
         }
-        let els = form.querySelectorAll("div.error");
+        let els = form.querySelectorAll("div.invalid-feedback");
         for (let i = 0; i < els.length; i++) {
             els[i].parentElement.removeChild(els[i]);
         }
-        els = form.querySelectorAll("div.hasError");
+        els = form.querySelectorAll("has-error");
         for (let i = 0; i < els.length; i++) {
-            els[i].classList.remove("hasError");
+            els[i].classList.remove("has-error");
+        }
+        form.classList.remove("has-error");
+        els = form.querySelectorAll("is-invalid");
+        for (let i = 0; i < els.length; i++) {
+            els[i].classList.remove("is-invalid");
         }
     }
 
@@ -419,6 +427,18 @@ const mispaf = (function () {
         }
     }
 
+    function vanish() {
+        // hide previous page
+        let actives = document.querySelectorAll(".page.active");
+        if (actives !== null) for (let i = 0; i < actives.length; i++) {
+            actives[i].classList.remove("active");
+            if ("bootstrapModal" in actives[i]) {
+                actives[i].bootstrapModal.hide();
+                delete actives[i].bootstrapModal;
+            }
+        }
+    }
+
     function page() {
         if (arguments.length == 0) {
             let el = document.querySelector('.page.active');
@@ -429,7 +449,7 @@ const mispaf = (function () {
             let event = (() => {
                 function stopPropagation() { keepgoing = false; }
                 return { stopPropagation, preventDefault: stopPropagation };
-            });
+            })();
             let target = arguments[0];
             let current = page();
             event.leave = current;
@@ -455,20 +475,28 @@ const mispaf = (function () {
             fireEvent('enter:' + target, event, () => keepgoing, arguments[1]);
             if (!keepgoing) return;
             if ((el.matches || el.matchesSelector).apply(el, [".modal"])) {
-                // this is a modal page => keep on showing current page + place hider to prevent interaction outside of this new page
-                let hider = document.querySelector(".hider");
-                if (hider) {
-                    // there is already an hider => keep it as well as the page already blured, remove the current modal dialog and show the new one
-                    if (current !== null) document.querySelector('#' + current).classList.remove("active");
-                    // show new page
-                    el.classList.add("active");
+                if (typeof bootstrap != "undefined") {
+                    let modal = new bootstrap.Modal(el);
+                    modal.show();
+                    el.bootstrapModal = modal;
                 } else {
-                    hider = document.createElement("DIV");
-                    hider.classList.add("hider");
-                    document.body.appendChild(hider);
-                    if (current !== null) {
-                        document.querySelector('#' + current).classList.remove("active");
-                        document.querySelector('#' + current).classList.add("blurred");
+                    // this is a modal page => keep on showing current page + place hider to prevent interaction outside of this new page
+                    let hider = document.querySelector(".hider");
+                    if (hider) {
+                        // there is already an hider => keep it as well as the page already blured, remove the current modal dialog and show the new one
+                        if (current !== null) document.querySelector('#' + current).classList.remove("active");
+                        // show new page
+                        el.classList.add("active");
+                    } else {
+                        hider = document.createElement("DIV");
+                        hider.classList.add("hider");
+                        document.body.appendChild(hider);
+                        vanish();
+                        if (current !== null) {
+                            document.querySelector('#' + current).classList.add("blurred");
+                        }
+                        // show new page
+                        el.classList.add("active");
                     }
                 }
             } else {
@@ -478,8 +506,7 @@ const mispaf = (function () {
                 }
                 let hider = document.querySelector(".hider");
                 if (hider) hider.parentElement.removeChild(hider);
-                // hide previous page
-                if (current !== null) document.querySelector('#' + current).classList.remove("active");
+                vanish();
             }
             // show new page
             el.classList.add("active");
@@ -489,6 +516,18 @@ const mispaf = (function () {
             // update menu : set new tag
             elems = document.querySelectorAll('a[href="#' + target + '"]');
             for (let i = 0; i < elems.length; i++) elems[i].classList.add("menuSelected");
+            // force close all dropdown menus
+            let dropdowns = document.querySelectorAll('.dropdown-menu.show');
+            for (let i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].classList.remove("show");
+                let id = dropdowns[i].getAttribute('aria-labelledby');
+                if (id != null) {
+                    let target = document.getElementById(id);
+                    if (target != null) {
+                        target.classList.remove("show");
+                    }
+                }
+            }
             // manage history ?
             if (mispaf.enableHistory === true) {
                 history.pushState({}, "", "#" + target);
@@ -529,6 +568,9 @@ const mispaf = (function () {
         if (!config.id || !(typeof config.id == "string") || !/^[a-z]/.test(config.id.test)) {
             throw new Error("Missing or invalid id");
         }
+        if (document.getElementById(config.id) != null) {
+            throw new Error("Cannot add page as it already exists: " + config.id);
+        }
         let page;
         if ("html" in config) {
             if (document.getElementById(name) != null) {
@@ -551,8 +593,11 @@ const mispaf = (function () {
         let map = {};
         let proxy = new Proxy(page, {
             get(_, prop) {
-                if (prop in page) {
-                    return Reflect.get(...arguments);
+                if (prop == "form") {
+                    if (page.tagName == "FORM") return page;
+                    return page.querySelector("form");
+                } else if (prop in page) {
+                    return page[prop];
                 } else if (prop in map) {
                     if (prop.length > 1 && prop.endsWith("s")) {
                         return page.querySelectorAll(map[prop]);
@@ -587,7 +632,7 @@ const mispaf = (function () {
             return ts.startsWith("=>");
         }
 
-        function wrap(obj, prop, preventDefault = false) {
+        function wrap(obj, prop, preventDefault=false) {
             if (isArrowFn(obj[prop])) {
                 throw new Error("A proper function is required, but an arrow function (=>) was provided for " + prop + " for the page " + obj.id);
             }
@@ -626,8 +671,12 @@ const mispaf = (function () {
                     let tgt = k.substring(idx + 1);
                     after.push(() => {
                         let items = page.querySelectorAll(tgt);
-                        for (let i = 0; i < items.length; i++) {
-                            items[i].addEventListener(evt, wrap(config, k, true));
+                        if (items.length == 0) {
+                            throw new Error("Invalid parameter " + k);
+                        } else {
+                            for (let i = 0; i < items.length; i++) {
+                                items[i].addEventListener(evt, wrap(config, k, true));
+                            }
                         }
                     });
             }
@@ -643,7 +692,11 @@ const mispaf = (function () {
                         enter: config.id,
                         target: page
                     };
-                    await after[i](event);
+                    try {
+                        await after[i](event);
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
             }, 1);
         }
@@ -662,6 +715,13 @@ const mispaf = (function () {
                 }
             })
         });
+    }
+
+    class HTTPError extends Error {
+        constructor(message, status) {
+            super(message || "Internal Server Error");
+            this.status = status || 500;
+        }
     }
 
     return {
@@ -684,7 +744,9 @@ const mispaf = (function () {
         reset,
         unescape,
         addPage,
-        api
+        api,
+        HTTPError
     }
 
 })();
+

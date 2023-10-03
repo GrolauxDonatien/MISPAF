@@ -2,15 +2,17 @@ mispaf.addPage({
     id: 'info',
     class: "center",
     html: `
-    <div class="box">
-        <form data-id="form">
-            <h4>Information</h4>
-            <div class="boxtop">
-                <div data-id="info"></div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <hr>
-            <input type="submit" data-id="ok" value="Fermer" class="roundedButton">
-        </form>
+            <div class="modal-body" data-id="info"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary">Fermer</button>
+            </div>
+        </div>
     </div>
     `,
     type: 'modal',
@@ -18,7 +20,7 @@ mispaf.addPage({
         this.old = event.leave;
         this.info.innerText = data;
     },
-    'click:input'() {
+    'click:button'() {
         mispaf.page(this.old);
     }
 });
